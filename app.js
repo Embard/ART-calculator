@@ -601,55 +601,71 @@ function signatureFromCounts(counts) {
   return counts.join('|');
 }
 
-function baseObjectiveScore(totals, fishCount, objective) {
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
+
+function normalizedCore(totals) {
+  return {
+    health: clamp(Math.max(0, totals.health) / 10, 0, 3),
+    blood: clamp(Math.max(0, totals.blood) / 100, 0, 3),
+    shock: clamp(Math.max(0, totals.shock) / 50, 0, 3),
+    radBalance: clamp(Math.max(0, totals.radBalance) / 30, 0, 3)
+  };
+}
+
+function balancedCoreScore(totals) {
+  const n = normalizedCore(totals);
+  const weakest = Math.min(n.health, n.blood, n.shock, n.radBalance);
+  const sum = n.health + n.blood + n.shock + n.radBalance;
+  return weakest * 10000 + sum * 1200;
+}
+
+function penalties(totals, fishCount, phase = 'base') {
   const waterPenalty = Math.max(0, -totals.water);
   const foodPenalty = Math.max(0, -totals.food);
-  const bleedPenalty = Math.max(0, totals.bleedChance) * 6 + Math.max(0, -totals.bleedHeal) * 4;
-  const fishPenalty = fishCount * 420;
-
-  const commonPenalty = waterPenalty * 0.35 + foodPenalty * 0.35 + bleedPenalty + fishPenalty;
+  const bleedPenalty = Math.max(0, totals.bleedChance) * (phase === 'final' ? 70 : 10) + Math.max(0, -totals.bleedHeal) * (phase === 'final' ? 35 : 6);
+  const fishPenalty = fishCount * (phase === 'final' ? 9000 : 900);
+  const softPenalty = waterPenalty * (phase === 'final' ? 1.2 : 0.2) + foodPenalty * (phase === 'final' ? 1.2 : 0.2);
   const hardPenalty =
-    Math.max(0, -totals.health) * 700 +
-    Math.max(0, -totals.blood) * 40 +
-    Math.max(0, -totals.shock) * 90 +
-    Math.max(0, -totals.radBalance) * 120;
+    Math.max(0, -totals.health) * (phase === 'final' ? 200000 : 12000) +
+    Math.max(0, -totals.blood) * (phase === 'final' ? 80000 : 5000) +
+    Math.max(0, -totals.shock) * (phase === 'final' ? 100000 : 7000) +
+    Math.max(0, -totals.radBalance) * (phase === 'final' ? 120000 : 8000);
+  return { waterPenalty, foodPenalty, bleedPenalty, fishPenalty, softPenalty, hardPenalty };
+}
+
+function scoreByObjective(totals, fishCount, objective, phase = 'base') {
+  const n = normalizedCore(totals);
+  const balance = balancedCoreScore(totals);
+  const p = penalties(totals, fishCount, phase);
+
+  const common = balance - p.softPenalty - p.bleedPenalty - p.fishPenalty - p.hardPenalty;
 
   switch (objective) {
     case 'health':
-      return totals.health * 170 + totals.blood * 1.1 + totals.shock * 3.2 + totals.radBalance * 4.0 - commonPenalty - hardPenalty;
+      return common + n.health * (phase === 'final' ? 20000 : 2200) + totals.health * (phase === 'final' ? 350 : 45) + n.shock * 800 + n.radBalance * 800 + n.blood * 500;
     case 'blood':
-      return totals.blood * 2.4 + totals.health * 55 + totals.shock * 2.8 + totals.radBalance * 3.8 - commonPenalty - hardPenalty;
+      return common + n.blood * (phase === 'final' ? 20000 : 2200) + totals.blood * (phase === 'final' ? 30 : 4) + n.health * 1000 + n.shock * 700 + n.radBalance * 700;
     case 'shock':
-      return totals.shock * 9.2 + totals.health * 55 + totals.blood * 1.1 + totals.radBalance * 3.5 - commonPenalty - hardPenalty;
+      return common + n.shock * (phase === 'final' ? 22000 : 2400) + totals.shock * (phase === 'final' ? 140 : 18) + n.health * 900 + n.blood * 500 + n.radBalance * 650;
     case 'radBalance':
-      return totals.radBalance * 11 + totals.health * 52 + totals.blood * 1.0 + totals.shock * 2.6 - commonPenalty - hardPenalty;
+      return common + n.radBalance * (phase === 'final' ? 22000 : 2400) + totals.radBalance * (phase === 'final' ? 160 : 22) + n.health * 900 + n.blood * 500 + n.shock * 650;
     case 'balanced':
     default:
-      return totals.health * 120 + totals.blood * 1.6 + totals.shock * 4.6 + totals.radBalance * 5.2 - commonPenalty - hardPenalty;
+      return common + n.health * (phase === 'final' ? 8000 : 900) + n.blood * (phase === 'final' ? 7500 : 850) + n.shock * (phase === 'final' ? 7800 : 880) + n.radBalance * (phase === 'final' ? 7600 : 860);
   }
+}
+
+function baseObjectiveScore(totals, fishCount, objective) {
+  return scoreByObjective(totals, fishCount, objective, 'base');
 }
 
 function finalObjectiveScore(totals, fishCount, objective) {
-  const waterPenalty = Math.max(0, -totals.water);
-  const foodPenalty = Math.max(0, -totals.food);
-  const bleedPenalty = Math.max(0, totals.bleedChance) * 30 + Math.max(0, -totals.bleedHeal) * 20;
-  const fishPenalty = fishCount * 12000;
-
-  switch (objective) {
-    case 'health':
-      return totals.health * 100000 + totals.blood * 50 + totals.shock * 3000 + totals.radBalance * 2500 - fishPenalty - waterPenalty * 10 - foodPenalty * 10 - bleedPenalty;
-    case 'blood':
-      return totals.blood * 1000 + totals.health * 20000 + totals.shock * 2400 + totals.radBalance * 2200 - fishPenalty - waterPenalty * 10 - foodPenalty * 10 - bleedPenalty;
-    case 'shock':
-      return totals.shock * 15000 + totals.health * 16000 + totals.blood * 40 + totals.radBalance * 1800 - fishPenalty - waterPenalty * 10 - foodPenalty * 10 - bleedPenalty;
-    case 'radBalance':
-      return totals.radBalance * 20000 + totals.health * 15000 + totals.blood * 35 + totals.shock * 1400 - fishPenalty - waterPenalty * 10 - foodPenalty * 10 - bleedPenalty;
-    default:
-      return finalObjectiveScore(totals, fishCount, 'health');
-  }
+  return scoreByObjective(totals, fishCount, objective, 'final');
 }
 
-function beamSearch(slotCount, objective, beamWidth = 80) {
+function beamSearch(slotCount, objective, beamWidth = 220) {
   const qty = inventoryQtyArray();
   const totalOwned = qty.reduce((a, b) => a + b, 0);
   if (totalOwned < slotCount) return [];
@@ -753,7 +769,7 @@ function hillClimb(candidate, objective) {
 }
 
 function buildCandidatePool(slotCount) {
-  const objectives = ['balanced', 'health', 'blood', 'shock', 'radBalance'];
+  const objectives = ['balanced', 'health', 'blood', 'shock', 'radBalance', 'balanced'];
   const pool = new Map();
 
   objectives.forEach(obj => {
@@ -775,7 +791,7 @@ function pickTopVariants(pool, objective) {
     .sort((a, b) => finalObjectiveScore(b.totals, b.fishCount, objective) - finalObjectiveScore(a.totals, a.fishCount, objective));
 
   const improved = [];
-  candidates.slice(0, 12).forEach(c => {
+  candidates.slice(0, 24).forEach(c => {
     const better = hillClimb(c, objective);
     improved.push(better);
   });
@@ -913,13 +929,16 @@ function renderVariants() {
   });
 }
 
-function applyBestHealthVariant() {
-  if (!state.variants || !state.variants.health || !state.variants.health.length) {
-    renderVariants();
+function applyBestBuild() {
+  const slotCount = state.beltContainers * 3;
+  const pool = buildCandidatePool(slotCount).filter(c => isSafeTotals(c.totals));
+  if (!pool.length) {
+    alert('Безопасная сборка из текущего инвентаря не найдена.');
+    return;
   }
-  const best = state.variants && state.variants.health && state.variants.health[0];
+  const best = pool.sort((a, b) => finalObjectiveScore(b.totals, b.fishCount, 'balanced') - finalObjectiveScore(a.totals, a.fishCount, 'balanced'))[0];
   if (!best) {
-    alert('Безопасный лучший вариант по здоровью не найден из текущего инвентаря.');
+    alert('Безопасная сборка из текущего инвентаря не найдена.');
     return;
   }
   state.slots = materializeSlotsFromCounts(best.counts);
@@ -954,7 +973,7 @@ async function init() {
   renderAll();
 }
 
-document.getElementById('applyBestBtn').addEventListener('click', applyBestHealthVariant);
+document.getElementById('applyBestBtn').addEventListener('click', applyBestBuild);
 document.getElementById('refreshVariantsBtn').addEventListener('click', renderVariants);
 document.getElementById('clearBuildBtn').addEventListener('click', clearBuild);
 document.getElementById('saveStateBtn').addEventListener('click', () => {
