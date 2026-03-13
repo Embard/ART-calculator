@@ -10,7 +10,7 @@
   <div class="bg"></div>
   <div class="app">
     <header class="topbar glass">
-      <div>
+      <div class="brand">
         <div class="eyebrow">STALKER DAYZ BUILD HELPER</div>
         <h1>Помощник по сборкам артефактов</h1>
       </div>
@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="muted small">
-          Заполни, сколько у тебя есть каждого арта. Автоподбор и варианты используют только этот инвентарь.
+          Укажи, сколько артов у тебя есть. Подбор и варианты используют только этот инвентарь.
         </div>
         <div class="inventory-list" id="inventoryList"></div>
       </aside>
@@ -52,9 +52,7 @@
             <span class="pill">Из инвентаря: <b id="ownedUsageLabel">0</b></span>
           </div>
         </div>
-        <div class="muted small">
-          Контейнеры здесь только для визуала, как в игре. Логика считается по всей сборке целиком.
-        </div>
+        <div class="muted small">Контейнеры — только визуал как в игре. Логика считается по всей сборке целиком.</div>
         <div id="containersRoot" class="containers-root"></div>
       </section>
 
@@ -89,7 +87,7 @@
         </div>
       </div>
       <div class="muted small">
-        Показываются только безопасные и сбалансированные варианты: здоровье, кровь, шок и баланс радиации не уходят в минус. Вода и еда считаются вторичными. Допускается использовать меньше 12/15 слотов, если это даёт более нормальную сборку. Рыбка имеет сильный штраф по приоритету.
+        Показываются только безопасные и сбалансированные варианты: здоровье, кровь, шок и баланс радиации не уходят в минус. Вода и еда считаются вторичными.
       </div>
       <div id="variantsRoot" class="variants-root"></div>
     </section>
@@ -103,7 +101,7 @@
           <div class="eyebrow">ВЫБОР АРТА</div>
           <h3 id="pickerTitle">Выбери артефакт</h3>
         </div>
-        <button class="icon-btn" data-close-picker="1">✕</button>
+        <button class="icon-btn" data-close-picker="1" aria-label="Закрыть">✕</button>
       </div>
       <div class="picker-toolbar">
         <input id="pickerSearch" type="search" placeholder="Поиск..." />
@@ -123,8 +121,8 @@
         <div class="slot-name">Пусто</div>
       </button>
       <div class="slot-actions">
-        <button class="btn tiny duplicate-btn" type="button">Дублировать</button>
-        <button class="btn tiny danger remove-btn" type="button">Убрать</button>
+        <button class="icon-action duplicate-btn" type="button" title="Дублировать" aria-label="Дублировать">⧉</button>
+        <button class="icon-action remove-btn" type="button" title="Убрать" aria-label="Убрать">✕</button>
       </div>
     </div>
   </template>
