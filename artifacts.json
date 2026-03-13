@@ -27,7 +27,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/barhat.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Батарейка",
@@ -42,7 +42,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/batareyka.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Белый обруч",
@@ -57,7 +57,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/belyy-obruch.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Браслет",
@@ -72,7 +72,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/braslet.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Булавка",
@@ -87,7 +87,7 @@
     "bleedChance": 50.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/bulavka.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Виноград",
@@ -102,7 +102,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/vinograd.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Вспышка",
@@ -117,7 +117,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/vspyshka.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Выверт",
@@ -132,7 +132,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/vyvert.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Гаргона",
@@ -147,7 +147,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/gargona.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Генератор",
@@ -162,7 +162,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/generator.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Джейбк",
@@ -177,7 +177,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/dzheybk.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Диабло",
@@ -192,7 +192,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/diablo.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Жаба",
@@ -207,7 +207,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/zhaba.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Золотая рыбка",
@@ -222,7 +222,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": true,
-    "image": "assets/artifacts/zolotaya-rybka.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Зуда",
@@ -747,7 +747,7 @@
     "bleedChance": 0.0,
     "bleedHeal": 0.0,
     "isFish": false,
-    "image": "assets/artifacts/graviy.png"
+    "image": "assets/artifacts/placeholder.png"
   },
   {
     "name": "Фонтан",
