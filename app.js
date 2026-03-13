@@ -66,7 +66,8 @@ function normalizeArt(a) {
     radBalance: Number(a.radBalance || 0),
     bleedChance: Number(a.bleedChance || 0),
     bleedHeal: Number(a.bleedHeal || 0),
-    isFish: Boolean(a.isFish || canonicalName(a.name).toLowerCase() === 'золотая рыбка')
+    isFish: Boolean(a.isFish || canonicalName(a.name).toLowerCase() === 'золотая рыбка'),
+    image: a.image || 'assets/artifacts/placeholder.png'
   };
 }
 
@@ -408,30 +409,82 @@ function renderInventory() {
     .forEach(art => {
       const item = document.createElement('div');
       item.className = 'inventory-item';
-      item.innerHTML = `
-        <div>
-          <div class="inventory-name">${art.name}</div>
-          <div class="inventory-meta">${artStatsChips(art)}</div>
-        </div>
-      `;
-      const input = document.createElement('input');
-      input.className = 'inventory-qty';
-      input.type = 'number';
-      input.min = '0';
-      input.step = '1';
-      input.value = Number(state.inventory[art.name] || 0);
-      input.addEventListener('change', () => {
-        state.inventory[art.name] = Math.max(0, parseInt(input.value || '0', 10));
-        saveState();
-        renderAll();
-      });
-      item.appendChild(input);
+
+      const info = document.createElement('div');
+      info.className = 'inventory-main';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'inventory-thumb';
+      setThumb(thumb, art, '');
+
+      const textWrap = document.createElement('div');
+      const name = document.createElement('div');
+      name.className = 'inventory-name';
+      name.textContent = art.name;
+      const meta = document.createElement('div');
+      meta.className = 'inventory-meta';
+      meta.innerHTML = artStatsChips(art);
+      textWrap.append(name, meta);
+      info.append(thumb, textWrap);
+
+      const currentQty = Number(state.inventory[art.name] || 0);
+      const stepper = buildStepper(
+        currentQty,
+        () => {
+          state.inventory[art.name] = Math.max(0, Number(state.inventory[art.name] || 0) - 1);
+          saveState();
+          renderAll();
+        },
+        () => {
+          state.inventory[art.name] = Math.max(0, Number(state.inventory[art.name] || 0) + 1);
+          saveState();
+          renderAll();
+        }
+      );
+
+      item.append(info, stepper);
       inventoryList.appendChild(item);
     });
 }
 
 function initialFor(name) {
   return name.split(/\s+/).slice(0,2).map(x => x[0]).join('').toUpperCase();
+}
+
+
+function artImageUrl(art) {
+  return (art && art.image) ? art.image : 'assets/artifacts/placeholder.png';
+}
+
+function setThumb(el, art, placeholder = '+') {
+  if (!el) return;
+  if (art) {
+    el.classList.add('has-image');
+    el.innerHTML = `<img src="${artImageUrl(art)}" alt="${art.name}" loading="lazy" />`;
+  } else {
+    el.classList.remove('has-image');
+    el.textContent = placeholder;
+  }
+}
+
+function buildStepper(currentValue, onMinus, onPlus) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qty-stepper';
+  const minus = document.createElement('button');
+  minus.type = 'button';
+  minus.className = 'qty-btn';
+  minus.textContent = '−';
+  minus.addEventListener('click', onMinus);
+  const value = document.createElement('div');
+  value.className = 'qty-value';
+  value.textContent = String(currentValue);
+  const plus = document.createElement('button');
+  plus.type = 'button';
+  plus.className = 'qty-btn';
+  plus.textContent = '+';
+  plus.addEventListener('click', onPlus);
+  wrap.append(minus, value, plus);
+  return wrap;
 }
 
 function slotCanUseArt(name, slotIndex) {
@@ -469,10 +522,10 @@ function renderBuilder() {
       const artName = state.slots[slotIndex];
       if (artName && state.artifactsMap[artName]) {
         const art = state.artifactsMap[artName];
-        icon.textContent = initialFor(art.name);
+        setThumb(icon, art, '');
         nameEl.innerHTML = `<div>${art.name}</div><div class="muted small">${artStatsChips(art)}</div>`;
       } else {
-        icon.textContent = '+';
+        setThumb(icon, null, '+');
         nameEl.textContent = 'Выбрать арт';
       }
 
@@ -543,6 +596,7 @@ function renderPicker() {
     card.className = 'pick-card';
     card.innerHTML = `
       <div class="pick-head">
+        <div class="pick-thumb"><img src="${artImageUrl(art)}" alt="${art.name}" loading="lazy" /></div>
         <div class="pick-name">${art.name}</div>
         <div class="badge">${ownedOnly ? `Доступно ${remaining}` : `Есть ${state.inventory[art.name] || 0}`}</div>
       </div>
