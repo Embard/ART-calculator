@@ -131,3 +131,22 @@ select:focus,input:focus{border-color:#5ec6ff}
   .variant-cards,.picker-list{grid-template-columns:1fr}
   .container-slots{grid-template-columns:1fr}
 }
+
+
+
+.slot-card.locked .slot-main{
+  border-color: rgba(94,198,255,.55);
+  box-shadow: 0 0 0 1px rgba(94,198,255,.18) inset, 0 0 18px rgba(94,198,255,.12);
+}
+.slot-card.locked .slot-name > div:first-child::before{
+  content:"🔒 ";
+}
+.icon-action.lock-btn{
+  background: rgba(94,198,255,.08);
+  border-color: rgba(94,198,255,.22);
+}
+.icon-action.lock-btn.active{
+  background: rgba(94,198,255,.22);
+  border-color: rgba(94,198,255,.48);
+  color: #d7f1ff;
+}
